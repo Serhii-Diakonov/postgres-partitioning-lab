@@ -98,6 +98,47 @@ Partitioning is an operational superpower:
 
 ---
 # Practice
+A section which contains practical examples of partitioning.
+
+### Prerequisites:
+- **Docker** installed on your machine.
+- About 50 Gb of free disk space (the more, the better).
+- **pgAdmin** for visualization can be downloaded to your machine or launched from Docker.
+ In case of running from Docker specify `host.docker.internal` as host in pgAdmin instead of `localhost`. Creds specified under `PGADMIN_DEFAULT_EMAIL` and `PGADMIN_DEFAULT_PASSWORD` in [docker-compose.yml](docker-compose.yml).
+
+> [!NOTE]
+> Initial setup of the test dataset could take a while. It depends on your hardware. For my MacBook Pro M1 16 Gb RAM it took ~30–40 minutes.
+
+> [!WARNING]
+> Using PostgreSQL in Docker container has some limitations regarding hardware-related staff, e.g. buffer sizes and so on. For a better experience, it's recommended to use Linux OS and to launch PostgreSQL server natively, without Docker.
+---
+#### Step 1:
+Initialize a database. Run script [init_db.sql](00.0__init_db.sql). It will create tables, fill them with data, and create indexes. Be attentive to the last command there, keep in mind PostgreSQL partitioning limitations.
+
+#### Step 2:
+Take a look at the structure of the database paying attention to partitions using [get_storage_stat.sql](00.1__get_storage_stat.sql).
+
+#### Step 3:
+Between queries, you can examine the database state (e.g. buffers) using some utility scripts such as [inspect_buffer_cache.sql](00.2__inspect_buffer_cache.sql), [hit_rate_stat.sql](04__hit_rate_stat.sql), [monitor_running_processes.sql](08__monitor_running_processes.sql). 
+Also you can experiment with your queries and see how data flows between cache and disk, how Postgres caches data and which impact it has on performance (cache warming) etc. To cool down the cache just restart your Docker container with postgres server running.
+
+#### Step 4:
+Run queries in [count.sql](01__count.sql) and examine `EXPLAIN ANALYZE` results.
+
+#### Step 5:
+Run queries in [partition_pruning.sql](02__partition_pruning.sql) and examine `EXPLAIN ANALYZE` results. Partition pruning is expected to appear for partitioned table.
+
+#### Step 6:
+Try `DELETE` vs `DROP` and `DETACH` from [detach_partition.sql](05__detach_partition.sql)
+
+#### Step 7:
+See Scatter-Gather problem running queries from script [scatter_gather_problem.sql](06__scatter_gather_problem.sql)
+
+#### Step 8 (Optional):
+Run migration script [batch_migration_to_partitioned_table.sql](07__batch_migration_to_partitioned_table.sql) to see how a monolith table is partitioned by chunks
+
+#### Step 9:
+Experiment, explore, and just have fun!
 
 ---
 # Dig Deeper

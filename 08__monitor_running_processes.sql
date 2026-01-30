@@ -1,5 +1,5 @@
 
--- See which processes are running
+-- See which processes are running. Represent running procedures or scripts with loops
 SELECT pid, query, state,
        now() - query_start AS duration,
        wait_event_type, wait_event
